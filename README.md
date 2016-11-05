@@ -12,8 +12,8 @@ listprint 是一个适用于 Python3 的简易变量绑定与多行输出刷新�
 
 ## DEMO
 
-+ ![源代码](listprint/demo/horse_race.py)
-+ ![Demo_gif](listprint/demo/images/horse_race_demo.gif)
++ [源代码](https://github.com/Yinzo/listprint/blob/master/demo/horse_race.py)
++ ![Demo_gif](https://raw.githubusercontent.com/yinzo/listprint/master/demo/images/horse_race_demo.gif)
 
 ## 使用说明
 1. `from listprint import output`
