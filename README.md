@@ -1,5 +1,5 @@
-# reprint
-[![reprint](https://img.shields.io/pypi/v/reprint.svg)](https://pypi.python.org/pypi/reprint)
+# reprint [![reprint](https://img.shields.io/pypi/v/reprint.svg)](https://pypi.python.org/pypi/reprint)
+
 reprint 是一个适用于 Python3 的简易变量绑定与多行输出刷新的库
 
 模块内对于 Unicode 字符宽度的计算参考了 [urwid项目](https://github.com/urwid/urwid/blob/master/urwid/old_str_util.py) 内的解决方案
@@ -12,7 +12,9 @@ reprint 是一个适用于 Python3 的简易变量绑定与多行输出刷新的
 
 ## 安装
 
-```sudo pip3 install reprint```
+```sh
+sudo pip3 install reprint
+```
 
 ## DEMO
 

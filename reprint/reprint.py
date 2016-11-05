@@ -3,6 +3,7 @@ import re
 import os
 import sys
 import time
+import shutil
 import threading
 from math import ceil
 from collections import ChainMap
@@ -81,7 +82,7 @@ def print_multi_line(content):
 
     global last_output_lines
     global overflow_flag
-    rows, columns = map(int, os.popen('stty size', 'r').read().split())
+    columns, rows = shutil.get_terminal_size()
     lines = lines_of_content(content, columns)
     if lines > rows:
         overflow_flag = True
@@ -167,8 +168,8 @@ class output:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.refresh(forced=True)
-        _, columns = os.popen('stty size', 'r').read().split()
-        print('\n' * lines_of_content(self.warped_obj, int(columns)), end="")
+        columns, _ = shutil.get_terminal_size()
+        print('\n' * lines_of_content(self.warped_obj, columns), end="")
         global last_output_lines
         global overflow_flag
         last_output_lines = 0
