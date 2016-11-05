@@ -18,10 +18,13 @@ listprint 是一个适用于 Python3 的简易变量绑定与多行输出刷新�
 ## 使用说明
 1. `from listprint import output`
 2. 使用 Python 的 `with` 语句来进行输出对象的初始化与对象控制，其中 `output` 对象包含以下参数可选：
-    1. `output_type`: `"list"` 或 `"dict"`， 分别对应 list 模式与 dict 模式，默认为 `"list"`
+    1. `output_type`: `"list"` 或 `"dict"`， 分别对应 list 模式与 dict 模式, 默认为 `"list"`
     2. `initial_len`: `int`, 只在 list 模式下有效，指定list的初始长度，便于直接使用下标修改而不需初始化, 默认为1
-    3. `interval`: `int`, 指定输出的刷新最小间隔，只有两次刷新间隔的毫秒数大于此数才会触发命令行输出刷新。默认为0
-3. 修改 `output` 对象内的内容即会刷新
+    3. `interval`: `int`, 指定输出的刷新最小间隔，只有两次刷新间隔的毫秒数大于此数才会触发命令行输出刷新, 默认为0
+
+			with output(output_type="list", initial_len=1, interval=0) as output_list:
+
+3. 修改 `output_list` 对象内的内容即会刷新命令行内容
 
 ## 注意事项
 + 在 `with` 块内，任何 `print` 、`logging` 或 `Exception` 等其他命令行输出都可能会导致输出格式异常，如果需要追加内容，请使用 `output` 对象的 `append` 函数（list 与 dict 模式都可用）
