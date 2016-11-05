@@ -2,7 +2,7 @@ import time
 import random
 import threading
 
-from listprint import output
+from reprint import output
 
 
 def some_op(index=0):

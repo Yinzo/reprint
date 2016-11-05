@@ -1,6 +1,6 @@
-# listprint
+# reprint
 
-listprint 是一个适用于 Python3 的简易变量绑定与多行输出刷新的库
+reprint 是一个适用于 Python3 的简易变量绑定与多行输出刷新的库
 
 模块内对于 Unicode 字符宽度的计算参考了 [urwid项目](https://github.com/urwid/urwid/blob/master/urwid/old_str_util.py) 内的解决方案
 
@@ -12,16 +12,16 @@ listprint 是一个适用于 Python3 的简易变量绑定与多行输出刷新�
 
 ## DEMO
 
-+ [DEMO源码](https://github.com/Yinzo/listprint/blob/master/demo/horse_race.py)
++ [DEMO源码](https://github.com/Yinzo/reprint/blob/master/demo/horse_race.py)
 
-![Demo_gif](https://raw.githubusercontent.com/yinzo/listprint/master/demo/images/horse_race_demo.gif)
+![Demo_gif](https://raw.githubusercontent.com/yinzo/reprint/master/demo/images/horse_race_demo.gif)
 
 ## 使用说明
 
 1. 导入 `output` 对象
 
 	```python
-	from listprint import output
+	from reprint import output
 	```
 2. 使用 Python 的 `with` 语句来进行输出对象的初始化与对象控制，其中 `output` 对象包含以下参数可选：
     + `output_type`: `"list"` 或 `"dict"`， 分别对应 list 模式与 dict 模式, 默认为 `"list"`
@@ -39,7 +39,10 @@ listprint 是一个适用于 Python3 的简易变量绑定与多行输出刷新�
 + 请勿直接给 `output` 对象赋予 `list` 或 `dict` 等对象，如果需要整体内容替换，请使用 `output` 对象的 `change` 函数（list 与 dict 模式都可用）
 + 当输出内容行数超过当前命令行高度时会导致消息清除不完整。所以若在意输出完成后，命令行的整洁度，请注意控制输出内容的行数。
 + 线程内调用请注意线程的初始化应被包含在 `with` 代码块内
++ 由于需要获取终端宽度，在非终端环境无法正常使用，后续会对非终端环境转化为普通命令行输出
 
+## TODO
++  对非终端环境转化输出为普通命令行输出
 
 
 
