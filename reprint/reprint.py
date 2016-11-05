@@ -67,11 +67,13 @@ def lines_of_content(content, border):
     result = 0
     if isinstance(content, list):
         for line in content:
-            result += ceil(line_len(line) / border)
+            _line = preprocess(line)
+            result += ceil(line_len(_line) / border)
     elif isinstance(content, dict):
         for k, v in content.items():
             # 加2是算上行内冒号和空格的宽度
-            result += ceil((line_len(k) + line_len(v) + 2) / border)
+            _k, _v = map(preprocess, (k, v))
+            result += ceil((line_len(_k) + line_len(_v) + 2) / border)
     return result
 
 
