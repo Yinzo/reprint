@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import re
-import os
 import sys
 import time
 import shutil
@@ -9,8 +8,8 @@ from math import ceil
 from collections import ChainMap
 
 last_output_lines = 0
-
 overflow_flag = False
+is_atty = sys.stdout.isatty()
 
 widths = [
     (126,    1), (159,    0), (687,     1), (710,   0), (711,   1),
@@ -82,6 +81,19 @@ def print_multi_line(content):
 
     global last_output_lines
     global overflow_flag
+    global is_atty
+
+    if not is_atty:
+        if isinstance(content, list):
+            for line in content:
+                print(line)
+        elif isinstance(content, dict):
+            for k, v in sorted(content.items(), key=lambda x: x[0]):
+                print("{}: {}".format(k, v))
+        else:
+            raise TypeError("Excepting types: list, dict. Got: {}".format(type(content)))
+        return
+
     columns, rows = shutil.get_terminal_size()
     lines = lines_of_content(content, columns)
     if lines > rows:
@@ -126,9 +138,13 @@ class output:
                 self.parent.refresh(int(time.time()), forced=False)
 
         def __setitem__(self, key, value):
+            global is_atty
             with self.lock:
                 super(output.SignalList, self).__setitem__(key, value)
-                self.parent.refresh(int(time.time()), forced=False)
+                if not is_atty:
+                    print("{}".format(value))
+                else:
+                    self.parent.refresh(int(time.time()), forced=False)
 
     class SignalDict(dict):
 
@@ -144,17 +160,22 @@ class output:
                 self.parent.refresh(int(time.time()), forced=False)
 
         def __setitem__(self, key, value):
+            global is_atty
+
             with self.lock:
                 super(output.SignalDict, self).__setitem__(key, value)
-                self.parent.refresh(int(time.time()), forced=False)
+                if not is_atty:
+                    print("{}: {}".format(key, value))
+                else:
+                    self.parent.refresh(int(time.time()), forced=False)
 
-    def __init__(self, output_type="list", initial_len=1, interval=0.1):
+    def __init__(self, output_type="list", initial_len=1, interval=0):
+
         if output_type is "list":
             self.warped_obj = output.SignalList(self, [''] * initial_len)
         elif output_type is "dict":
             self.warped_obj = output.SignalDict(self, {})
 
-        # 默认刷新间隔为 0.1s
         self.interval = interval
         self._last_update = int(time.time())
 
@@ -164,14 +185,23 @@ class output:
             self._last_update = new_time
 
     def __enter__(self):
+        global is_atty
+        if not is_atty:
+            print("Not in terminal, reprint now using normal build-in print function.")
+
         return self.warped_obj
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        global is_atty
+
         self.refresh(forced=True)
-        columns, _ = shutil.get_terminal_size()
-        print('\n' * lines_of_content(self.warped_obj, columns), end="")
-        global last_output_lines
-        global overflow_flag
-        last_output_lines = 0
-        if overflow_flag:
-            print("检测到输出过程中，输出行数曾大于命令行窗口行数，这会导致输出清除不完整,而使输出不停增长。请注意控制输出行数。")
+        if is_atty:
+            columns, _ = shutil.get_terminal_size()
+            print('\n' * lines_of_content(self.warped_obj, columns), end="")
+            global last_output_lines
+            global overflow_flag
+            last_output_lines = 0
+            if overflow_flag:
+                print("Detected that the lines of output has been exceeded the height of terminal windows, which \
+                caused the former output remained and keep adding new lines.")
+                print("检测到输出过程中, 输出行数曾大于命令行窗口行数, 这会导致输出清除不完整, 而使输出不停增长。请注意控制输出行数。")
