@@ -1,14 +1,14 @@
 # reprint [![reprint](https://img.shields.io/pypi/v/reprint.svg)](https://pypi.python.org/pypi/reprint)
 
-reprint 是一个适用于 Python3 的简易变量绑定与多行输出刷新的库
+reprint 是一个适用于 Python 2/3 的简易变量绑定与多行输出刷新的库
 
 模块内对于 Unicode 字符宽度的计算参考了 [urwid项目](https://github.com/urwid/urwid/blob/master/urwid/old_str_util.py) 内的解决方案
 
 ## 特性
++ 同时支持 Python 2/3
 + 简易变量绑定，内容修改时自动刷新命令行输出
 + 多行输出刷新，实现不同行内容由独立变量控制，修改特定变量即能刷新命令行中特定行的内容
 + 多线程安全，使用了 threading.Lock 实现线程安全
-+ 无外部库依赖
 
 ## 安装
 

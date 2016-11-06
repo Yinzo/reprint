@@ -1,11 +1,17 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function, division
+
 import re
 import sys
 import time
-import shutil
 import threading
 from math import ceil
-from collections import ChainMap
+
+import six
+if six.PY2:
+    from backports.shutil_get_terminal_size import get_terminal_size
+else:
+    from shutil import get_terminal_size
 
 last_output_lines = 0
 overflow_flag = False
@@ -74,7 +80,7 @@ def lines_of_content(content, border):
             # 加2是算上行内冒号和空格的宽度
             _k, _v = map(preprocess, (k, v))
             result += ceil((line_len(_k) + line_len(_v) + 2) / border)
-    return result
+    return int(result)
 
 
 def print_multi_line(content):
@@ -94,7 +100,7 @@ def print_multi_line(content):
             raise TypeError("Excepting types: list, dict. Got: {}".format(type(content)))
         return
 
-    columns, rows = shutil.get_terminal_size()
+    columns, rows = get_terminal_size()
     lines = lines_of_content(content, columns)
     if lines > rows:
         overflow_flag = True
@@ -133,7 +139,10 @@ class output:
 
         def change(self, newlist):
             with self.lock:
-                self.clear()
+                if six.PY2:
+                    self[:] = []
+                else:
+                    self.clear()
                 self.extend(newlist)
                 self.parent.refresh(int(time.time()), forced=False)
 
@@ -156,7 +165,7 @@ class output:
         def change(self, newlist):
             with self.lock:
                 self.clear()
-                super(output.SignalDict, self).__init__(ChainMap(newlist))
+                super(output.SignalDict, self).update(newlist)
                 self.parent.refresh(int(time.time()), forced=False)
 
         def __setitem__(self, key, value):
@@ -196,7 +205,7 @@ class output:
 
         self.refresh(forced=True)
         if is_atty:
-            columns, _ = shutil.get_terminal_size()
+            columns, _ = get_terminal_size()
             print('\n' * lines_of_content(self.warped_obj, columns), end="")
             global last_output_lines
             global overflow_flag
