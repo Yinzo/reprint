@@ -13,7 +13,7 @@ reprint 是一个适用于 Python 2/3 的简易变量绑定与多行输出刷新
 ## 安装
 
 ```sh
-sudo pip3 install reprint
+pip install reprint
 ```
 
 ## DEMO
