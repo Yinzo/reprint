@@ -144,7 +144,7 @@ class output:
                 else:
                     self.clear()
                 self.extend(newlist)
-                self.parent.refresh(int(time.time()), forced=False)
+                self.parent.refresh(int(time.time()*1000), forced=False)
 
         def __setitem__(self, key, value):
             global is_atty
@@ -153,7 +153,7 @@ class output:
                 if not is_atty:
                     print("{}".format(value))
                 else:
-                    self.parent.refresh(int(time.time()), forced=False)
+                    self.parent.refresh(int(time.time()*1000), forced=False)
 
     class SignalDict(dict):
 
@@ -166,7 +166,7 @@ class output:
             with self.lock:
                 self.clear()
                 super(output.SignalDict, self).update(newlist)
-                self.parent.refresh(int(time.time()), forced=False)
+                self.parent.refresh(int(time.time()*1000), forced=False)
 
         def __setitem__(self, key, value):
             global is_atty
@@ -176,7 +176,7 @@ class output:
                 if not is_atty:
                     print("{}: {}".format(key, value))
                 else:
-                    self.parent.refresh(int(time.time()), forced=False)
+                    self.parent.refresh(int(time.time()*1000), forced=False)
 
     def __init__(self, output_type="list", initial_len=1, interval=0):
 
@@ -186,7 +186,7 @@ class output:
             self.warped_obj = output.SignalDict(self, {})
 
         self.interval = interval
-        self._last_update = int(time.time())
+        self._last_update = int(time.time()*1000)
 
     def refresh(self, new_time=0, forced=True):
         if new_time - self._last_update > self.interval or forced:
