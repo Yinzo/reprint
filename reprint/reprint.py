@@ -189,7 +189,7 @@ class output:
         self._last_update = int(time.time()*1000)
 
     def refresh(self, new_time=0, forced=True):
-        if new_time - self._last_update > self.interval or forced:
+        if new_time - self._last_update >= self.interval or forced:
             print_multi_line(self.warped_obj)
             self._last_update = new_time
 
