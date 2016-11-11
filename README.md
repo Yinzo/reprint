@@ -46,7 +46,12 @@ pip install reprint
 ## Note
 + Within `with` block, any `print`/`logging`/`Exception` that do output on terminal would cause the format of reprint output abnormal. If you need to append some content to the end of output, use `append` function of `output` instance (works both in list or dict mode)
 + Don't assign a new `list` or `dict` to `output` instance. If you want to entirely change the list or dict, use `change` function of `output` instance (works both in list or dict mode)
-+ If the lines of output exceed the height of terminal windows, that will cause the former output remained and keep adding new lines to the terminal. So maybe you should control the length of your `output` instance
-+ The initialzation of threading should be within the `with` block if you use reprint in threading
++ If the lines of output exceed the height of terminal windows, that will cause the former output remained and keep adding new lines to the terminal. So maybe you should control the length of your `output` instance.
+	+ or you can use `force_single_line` mode, to force the output stay in single line
+        
+	```python
+	with output(output_type="list", initial_len=1, interval=0, force_single_line=True) as output_list:
+	```
++ The initialization of threading should be within the `with` block if you use reprint in threading
 + When using non-terminal output, reprint will use normal build-in `print` function.
 

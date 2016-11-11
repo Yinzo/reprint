@@ -52,9 +52,12 @@ def preprocess(content):
     return _content
 
 
-def print_line(content, columns):
+def print_line(content, columns, force_single_line):
     padding = " " * ((columns - line_len(content)) % columns)
-    print("{content}{padding}".format(content=content, padding=padding), end='')
+    output = "{content}{padding}".format(content=content, padding=padding)
+    if force_single_line:
+        output = output[:columns]
+    print(output, end='')
     sys.stdout.flush()
 
 
@@ -87,7 +90,7 @@ def lines_of_content(content, width):
     return int(result)
 
 
-def print_multi_line(content):
+def print_multi_line(content, force_single_line):
 
     global last_output_lines
     global overflow_flag
@@ -116,11 +119,11 @@ def print_multi_line(content):
     if isinstance(content, list):
         for line in content:
             _line = preprocess(line)
-            print_line(_line, columns)
+            print_line(_line, columns, force_single_line)
     elif isinstance(content, dict):
         for k, v in sorted(content.items(), key=lambda x: x[0]):
             _k, _v = map(preprocess, (k, v))
-            print_line("{}: {}".format(_k, _v), columns)
+            print_line("{}: {}".format(_k, _v), columns, force_single_line)
     else:
         raise TypeError("Excepting types: list, dict. Got: {}".format(type(content)))
 
@@ -185,7 +188,7 @@ class output:
                 else:
                     self.parent.refresh(int(time.time()*1000), forced=False)
 
-    def __init__(self, output_type="list", initial_len=1, interval=0):
+    def __init__(self, output_type="list", initial_len=1, interval=0, force_single_line=False):
 
         if output_type is "list":
             self.warped_obj = output.SignalList(self, [''] * initial_len)
@@ -193,11 +196,12 @@ class output:
             self.warped_obj = output.SignalDict(self, {})
 
         self.interval = interval
+        self.force_single_line = force_single_line
         self._last_update = int(time.time()*1000)
 
     def refresh(self, new_time=0, forced=True):
         if new_time - self._last_update >= self.interval or forced:
-            print_multi_line(self.warped_obj)
+            print_multi_line(self.warped_obj, self.force_single_line)
             self._last_update = new_time
 
     def __enter__(self):

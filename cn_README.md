@@ -44,6 +44,11 @@ pip install reprint
 + 在 `with` 块内，任何 `print` 、`logging` 或 `Exception` 等其他命令行输出都可能会导致输出格式异常，如果需要追加内容，请使用 `output` 对象的 `append` 函数（list 与 dict 模式都可用）
 + 请勿直接给 `output` 对象赋予 `list` 或 `dict` 等对象，如果需要整体内容替换，请使用 `output` 对象的 `change` 函数（list 与 dict 模式都可用）
 + 当输出内容行数超过当前命令行高度时会导致消息清除不完整。所以若在意输出完成后，命令行的整洁度，请注意控制输出内容的行数。
+	+ 或者你可以选择使用 `force_single_line` ，强制输出内容不会换行。
+	
+	```python
+	with output(output_type="list", initial_len=1, interval=0, force_single_line=True) as output_list:
+	```
 + 线程内调用请注意线程的初始化应被包含在 `with` 代码块内
 + 由于需要获取终端宽度，在非终端环境无法正常使用，非终端环境转化为普通命令行输出
 
