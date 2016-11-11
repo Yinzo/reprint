@@ -43,6 +43,7 @@ def get_char_width(char):
 def preprocess(content):
     """
     对输出内容进行预处理，转为str类型，并替换行内\r\t\n等字符为空格
+    do pre-process to the content, turn it into str, and replace \r\t\n with space
     """
 
     _content = str(content)
@@ -60,26 +61,29 @@ def print_line(content, columns):
 def line_len(line):
     """
     计算本行在输出到命令行后所占的宽度
+    calculate the width of output in terminal
     """
     assert isinstance(line, str)
     result = sum(map(get_char_width, line))
     return result
 
 
-def lines_of_content(content, border):
+def lines_of_content(content, width):
     """
     计算内容在特定输出宽度下实际显示的行数
+    calculate the actual rows with specific terminal width
     """
     result = 0
     if isinstance(content, list):
         for line in content:
             _line = preprocess(line)
-            result += ceil(line_len(_line) / border)
+            result += ceil(line_len(_line) / width)
     elif isinstance(content, dict):
         for k, v in content.items():
             # 加2是算上行内冒号和空格的宽度
+            # adding 2 for the for the colon and space ": "
             _k, _v = map(preprocess, (k, v))
-            result += ceil((line_len(_k) + line_len(_v) + 2) / border)
+            result += ceil((line_len(_k) + line_len(_v) + 2) / width)
     return int(result)
 
 
@@ -106,6 +110,7 @@ def print_multi_line(content):
         overflow_flag = True
 
     # 确保初始输出位置是位于最左处的
+    # to make sure the cursor is at the left most
     print("\b" * columns, end="")
 
     if isinstance(content, list):
@@ -120,9 +125,11 @@ def print_multi_line(content):
         raise TypeError("Excepting types: list, dict. Got: {}".format(type(content)))
 
     # 输出额外的空行来清除上一次输出的剩余内容
+    # do extra blank lines to wipe the remaining of last output
     print(" " * columns * (last_output_lines - lines), end="")
 
     # 回到初始输出位置
+    # back to the origin pos
     print("\r\b\r" * (max(last_output_lines, lines) + 1), end="")
     sys.stdout.flush()
     last_output_lines = lines
