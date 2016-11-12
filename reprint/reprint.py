@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import print_function, division
+from __future__ import print_function, division, unicode_literals
 
 import re
 import sys
@@ -46,27 +46,44 @@ def preprocess(content):
     do pre-process to the content, turn it into str, and replace \r\t\n with space
     """
 
-    _content = str(content)
+    if six.PY2:
+        _content = unicode(content, encoding=sys.stdin.encoding) if isinstance(content, str) else content
+        assert isinstance(_content, unicode)
+    elif six.PY3:
+        _content = str(content)
+
     _content = re.sub(r'\r|\t|\n', ' ', _content)
 
     return _content
 
 
+def cut_off_at(content, width):
+    if line_width(content) > width:
+        now = content[:width]
+        while line_width(now) > width:
+            now = now[:-1]
+        now += "$" * (width - line_width(now))
+        return now
+    else:
+        return content
+
 def print_line(content, columns, force_single_line):
-    padding = " " * ((columns - line_len(content)) % columns)
+
+    padding = " " * ((columns - line_width(content)) % columns)
     output = "{content}{padding}".format(content=content, padding=padding)
     if force_single_line:
-        output = output[:columns]
+        output = cut_off_at(output, columns)
     print(output, end='')
     sys.stdout.flush()
 
 
-def line_len(line):
+def line_width(line):
     """
     计算本行在输出到命令行后所占的宽度
     calculate the width of output in terminal
     """
-    assert isinstance(line, str)
+    if six.PY2:
+        assert isinstance(line, unicode)
     result = sum(map(get_char_width, line))
     return result
 
@@ -80,13 +97,13 @@ def lines_of_content(content, width):
     if isinstance(content, list):
         for line in content:
             _line = preprocess(line)
-            result += ceil(line_len(_line) / width)
+            result += ceil(line_width(_line) / width)
     elif isinstance(content, dict):
         for k, v in content.items():
             # 加2是算上行内冒号和空格的宽度
             # adding 2 for the for the colon and space ": "
             _k, _v = map(preprocess, (k, v))
-            result += ceil((line_len(_k) + line_len(_v) + 2) / width)
+            result += ceil((line_width(_k) + line_width(_v) + 2) / width)
     return int(result)
 
 
@@ -109,7 +126,9 @@ def print_multi_line(content, force_single_line):
 
     columns, rows = get_terminal_size()
     lines = lines_of_content(content, columns)
-    if lines > rows:
+    if force_single_line is False and lines > rows:
+        overflow_flag = True
+    elif force_single_line is True and len(content) > rows:
         overflow_flag = True
 
     # 确保初始输出位置是位于最左处的
@@ -190,9 +209,10 @@ class output:
 
     def __init__(self, output_type="list", initial_len=1, interval=0, force_single_line=False):
 
-        if output_type is "list":
+
+        if output_type == "list":
             self.warped_obj = output.SignalList(self, [''] * initial_len)
-        elif output_type is "dict":
+        elif output_type == "dict":
             self.warped_obj = output.SignalDict(self, {})
 
         self.interval = interval
@@ -217,7 +237,10 @@ class output:
         self.refresh(forced=True)
         if is_atty:
             columns, _ = get_terminal_size()
-            print('\n' * lines_of_content(self.warped_obj, columns), end="")
+            if self.force_single_line:
+                print('\n' * len(self.warped_obj), end="")
+            else:
+                print('\n' * lines_of_content(self.warped_obj, columns), end="")
             global last_output_lines
             global overflow_flag
             last_output_lines = 0
