@@ -10,8 +10,10 @@ from math import ceil
 import six
 if six.PY2:
     from backports.shutil_get_terminal_size import get_terminal_size
+    input = raw_input
 else:
     from shutil import get_terminal_size
+    from builtins import input
 
 last_output_lines = 0
 overflow_flag = False
@@ -27,7 +29,6 @@ widths = [
     (65131,  2), (65279,  1), (65376,   2), (65500, 1), (65510, 2),
     (120831, 1), (262141, 2), (1114109, 1),
 ]
-
 
 def get_char_width(char):
     global widths
@@ -207,7 +208,19 @@ class output:
                 else:
                     self.parent.refresh(int(time.time()*1000), forced=False)
 
-    def __init__(self, output_type="list", initial_len=1, interval=0, force_single_line=False):
+    def __init__(self, output_type="list", initial_len=1, interval=0, force_single_line=False, no_warning=False):
+        self.no_warning = no_warning
+        no_warning and print("All reprint warning diabled.")
+
+        global is_atty
+        # reprint does not work in the IDLE terminal, and any other environment that can't get terminal_size
+        if is_atty and not all(get_terminal_size()):
+            if not no_warning:
+                r = input("Fail to get terminal size, we got {}, continue anyway? (y/N)".format(get_terminal_size()))
+                if not (r and isinstance(r, str) and r.lower()[0] in ['y','t','1']):
+                    sys.exit(0)
+
+            is_atty = False
 
 
         if output_type == "list":
@@ -227,7 +240,8 @@ class output:
     def __enter__(self):
         global is_atty
         if not is_atty:
-            print("Not in terminal, reprint now using normal build-in print function.")
+            if not self.no_warning:
+                print("Not in terminal, reprint now using normal build-in print function.")
 
         return self.warped_obj
 
@@ -245,6 +259,7 @@ class output:
             global overflow_flag
             last_output_lines = 0
             if overflow_flag:
-                print("Detected that the lines of output has been exceeded the height of terminal windows, which \
-                caused the former output remained and keep adding new lines.")
-                print("检测到输出过程中, 输出行数曾大于命令行窗口行数, 这会导致输出清除不完整, 而使输出不停增长。请注意控制输出行数。")
+                if not self.no_warning:
+                    print("Detected that the lines of output has been exceeded the height of terminal windows, which \
+                    caused the former output remained and keep adding new lines.")
+                    print("检测到输出过程中, 输出行数曾大于命令行窗口行数, 这会导致输出清除不完整, 而使输出不停增长。请注意控制输出行数。")
