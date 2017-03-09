@@ -1,17 +1,17 @@
 # reprint [![reprint](https://img.shields.io/pypi/v/reprint.svg)](https://pypi.python.org/pypi/reprint)
 
-reprint is a module for Python 2/3 to binding variables and refresh multi line output in terminal.
+reprint is a Python 2/3 module for binding variables and refreshing multi-line output in terminal.
 
 The solution for calculating Unicode char width is from [urwid](https://github.com/urwid/urwid/blob/master/urwid/old_str_util.py)
 
 [中文版README](https://github.com/Yinzo/reprint/blob/master/cn_README.md)
 
 
-## Feature
-+ Support Python 2/3
-+ variables binding, automatically refresh command line output when variables changed
-+ multi line contents flush-able, every line of output comes from different variable in output object, changes on variable will refresh output
-+ thread safe, using `threading.Lock` to do that
+## Features
++ Python 2/3 support
++ Simple variable bindings and automatic command line refresh upon variable change
++ Simultaneous multi-line refresh with each line binded to different variables
++ Robust thread safety with `threading.Lock`
 
 ## Setup
 
@@ -32,32 +32,31 @@ pip install reprint
 	```python
 	from reprint import output
 	```
-2. Use `with` block to control the initalization ，`output` object contain these following parameters:
-    + `output_type`: `"list"` or `"dict"`， indicating list mode and dict mode, default as `"list"`.
-    + `initial_len`: `int`, only work in list mode, indicating the initial length of the list, for do some modification on the content without initialization, default as `1`.
-    + `interval`: `int`, the interval of refresh，only greater than this interval will trigger the refresh function, default as `0`.
+2. Use `with` block to control the initialization, `output` object contains the following parameters:
+    + `output_type`: `"list"` or `"dict"` (default: `"list"`), indicating the list mode or the dict mode.
+    + `initial_len`: `int` (default: `1`), only works in the list mode, indicating the initial length of the list. It's for modifying the content by index without initialization.  
+    + `interval`: `int` (default: `0`), the minimal refresh interval (in millisecond). The refresh function call will be ignored unless at least this amount of time has passed since last refresh.
 
 	```python
 	with output(output_type="list", initial_len=1, interval=0) as output_list:
 	```
 
-3. Change the variables in `output_list` will trigger the refresh of the command line output.
+3. Changing the variables in `output_list` will trigger the refresh of the command line output.
 
 ## Note
-+ Within `with` block, any `print`/`logging`/`Exception` that do output on terminal would cause the format of reprint output abnormal. If you need to append some content to the end of output, use `append` function of `output` instance (works both in list or dict mode).
-+ Don't assign a new `list` or `dict` to `output` instance. If you want to entirely change the list or dict, use `change` function of `output` instance (works both in list or dict mode).
-+ If the lines of output exceed the height of terminal windows, that will cause the former output remained and keep adding new lines to the terminal. So maybe you should control the length of your `output` instance.
-	+ or you can use `force_single_line` mode, to force the output stay in single line.
++ In the `with` block, any `print`/`logging`/`Exception` commands that print texts on terminal would ruin the format of the reprint output. If you need to append some content to the end of the output, use `append` function in the `output` object (works both in the list or the dict mode).
++ Don't assign a new `list` or `dict` to the `output` object. If you want to change the whole list or dict, use `change` function in the `output` object (works both in the list or the dict mode).
++ Old messages will not be fully wiped out if the height of the output is larger than the height of the terminal window. So you should control the length of your output.
+	+ Or you may use the `force_single_line` mode to force the output to stay in single line.
 
 	```python
 	with output(output_type="list", initial_len=1, interval=0, force_single_line=True) as output_list:
 	```
-+ The initialization of threading should be within the `with` block if you use reprint in threading.
-+ When using non-terminal output, reprint will use normal build-in `print` function.
-+ Does not work in the IDLE terminal, and any other environment that can't get terminal_size.
-+ If you want to disable all warning, use this:
++ The initialization of threading should be in the `with` block if you use reprint in threading.
++ When used in non-terminal environment, reprint will use the built-in `print` function.
++ Does not work in the IDLE terminal, and any other environment that doesn't provide terminal_size.
++ If you want to disable all warnings, use this:
 
 	```python
 	with output(no_warning=True) as output_list:
 	```
-
