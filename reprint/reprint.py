@@ -19,6 +19,8 @@ last_output_lines = 0
 overflow_flag = False
 is_atty = sys.stdout.isatty()
 
+magic_char = "\033[F"
+
 widths = [
     (126,    1), (159,    0), (687,     1), (710,   0), (711,   1),
     (727,    0), (733,    1), (879,     0), (1154,  1), (1161,  0),
@@ -159,7 +161,7 @@ def print_multi_line(content, force_single_line):
 
     # 回到初始输出位置
     # back to the origin pos
-    print("\r\b\r" * (max(last_output_lines, lines) + 1), end="")
+    print(magic_char * (max(last_output_lines, lines)-1), end="")
     sys.stdout.flush()
     last_output_lines = lines
 
