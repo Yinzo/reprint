@@ -43,18 +43,24 @@ def get_char_width(char):
 
 def preprocess(content):
     """
-    对输出内容进行预处理，转为str类型，并替换行内\r\t\n等字符为空格
-    do pre-process to the content, turn it into str, and replace \r\t\n with space
+    对输出内容进行预处理，转为str类型 (py3)，并替换行内\r\t\n等字符为空格
+    do pre-process to the content, turn it into str (for py3), and replace \r\t\n with space
     """
 
     if six.PY2:
-        _content = unicode(content, encoding=sys.stdin.encoding) if isinstance(content, str) else content
+        if not isinstance(content, unicode):
+            if isinstance(content, str):
+                _content = unicode(content, encoding=sys.stdin.encoding)
+            elif isinstance(content, int):
+                _content = unicode(content)
+        else:
+            _content = content
         assert isinstance(_content, unicode)
+
     elif six.PY3:
         _content = str(content)
 
     _content = re.sub(r'\r|\t|\n', ' ', _content)
-
     return _content
 
 
