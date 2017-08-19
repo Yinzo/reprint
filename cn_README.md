@@ -78,8 +78,8 @@ with output(output_type='dict', sort_key=lambda x:x[1]) as output_lines:
 
 ```python
 elif isinstance(content, dict):
-	for k, v in sorted(content.items(), key=sort_key):
-      	print("{}: {}".format(k, v))
+    for k, v in sorted(content.items(), key=sort_key):
+        print("{}: {}".format(k, v))
 ```
 
 **Q: 如何禁用所有的警告信息？**

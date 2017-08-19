@@ -80,8 +80,8 @@ then `reprint` will use that function as the `key` parameter in the `sorted` fun
 
 ```python
 elif isinstance(content, dict):
-	for k, v in sorted(content.items(), key=sort_key):
-      	print("{}: {}".format(k, v))
+    for k, v in sorted(content.items(), key=sort_key):
+        print("{}: {}".format(k, v))
 ```
 
 **Q: How to disable all warning?**
