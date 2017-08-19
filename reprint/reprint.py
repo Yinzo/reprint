@@ -116,7 +116,11 @@ def lines_of_content(content, width):
     return int(result)
 
 
-def print_multi_line(content, force_single_line):
+def print_multi_line(content, force_single_line, sort_key):
+    """
+    'sort_key' 参数只在 dict 模式时有效
+    'sort_key' parameter only available in 'dict' mode
+    """
 
     global last_output_lines
     global overflow_flag
@@ -127,7 +131,7 @@ def print_multi_line(content, force_single_line):
             for line in content:
                 print(line)
         elif isinstance(content, dict):
-            for k, v in sorted(content.items(), key=lambda x: x[0]):
+            for k, v in sorted(content.items(), key=sort_key):
                 print("{}: {}".format(k, v))
         else:
             raise TypeError("Excepting types: list, dict. Got: {}".format(type(content)))
@@ -149,7 +153,7 @@ def print_multi_line(content, force_single_line):
             _line = preprocess(line)
             print_line(_line, columns, force_single_line)
     elif isinstance(content, dict):
-        for k, v in sorted(content.items(), key=lambda x: x[0]):
+        for k, v in sorted(content.items(), key=sort_key):
             _k, _v = map(preprocess, (k, v))
             print_line("{}: {}".format(_k, _v), columns, force_single_line)
     else:
@@ -304,7 +308,9 @@ class output:
                     self.parent.refresh(int(time.time()*1000), forced=False)
 
 
-    def __init__(self, output_type="list", initial_len=1, interval=0, force_single_line=False, no_warning=False):
+    def __init__(self, output_type="list", initial_len=1, interval=0, force_single_line=False, no_warning=False, sort_key=lambda x:x[0]):
+        print("using customize sort key", str(sort_key))
+        self.sort_key = sort_key
         self.no_warning = no_warning
         no_warning and print("All reprint warning diabled.")
 
@@ -330,7 +336,7 @@ class output:
 
     def refresh(self, new_time=0, forced=True):
         if new_time - self._last_update >= self.interval or forced:
-            print_multi_line(self.warped_obj, self.force_single_line)
+            print_multi_line(self.warped_obj, self.force_single_line, sort_key=self.sort_key)
             self._last_update = new_time
 
     def __enter__(self):

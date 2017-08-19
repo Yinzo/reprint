@@ -29,34 +29,66 @@ pip install reprint
 
 1. Import the `output` object
 
-	```python
-	from reprint import output
-	```
+  ```python
+  from reprint import output
+  ```
+
 2. Use `with` block to control the initialization, `output` object contains the following parameters:
     + `output_type`: `"list"` or `"dict"` (default: `"list"`), indicating the list mode or the dict mode.
     + `initial_len`: `int` (default: `1`), only works in the list mode, indicating the initial length of the list. It's for modifying the content by index without initialization.  
     + `interval`: `int` (default: `0`), the minimal refresh interval (in millisecond). The refresh function call will be ignored unless at least this amount of time has passed since last refresh.
 
-	```python
-	with output(output_type="list", initial_len=1, interval=0) as output_list:
-	```
+    ```python
+    with output(output_type="list", initial_len=1, interval=0) as output_list:
+    ```
 
 3. Changing the variables in `output_list` will trigger the refresh of the command line output.
 
+
+
 ## Note
 + In the `with` block, any `print`/`logging`/`Exception` commands that print texts on terminal would ruin the format of the reprint output. If you need to append some content to the end of the output, use `append` function in the `output` object (works both in the list or the dict mode).
+
 + Don't assign a new `list` or `dict` to the `output` object. If you want to change the whole list or dict, use `change` function in the `output` object (works both in the list or the dict mode).
+
 + Old messages will not be fully wiped out if the height of the output is larger than the height of the terminal window. So you should control the length of your output.
-	+ Or you may use the `force_single_line` mode to force the output to stay in single line.
+  + Or you may use the `force_single_line` mode to force the output to stay in single line.
 
-	```python
-	with output(output_type="list", initial_len=1, interval=0, force_single_line=True) as output_list:
-	```
+  ```python
+  with output(output_type="list", initial_len=1, interval=0, force_single_line=True) as output_list:
+  ```
+
 + The initialization of threading should be in the `with` block if you use reprint in threading.
-+ When used in non-terminal environment, reprint will use the built-in `print` function.
-+ Does not work in the IDLE terminal, and any other environment that doesn't provide terminal_size.
-+ If you want to disable all warnings, use this:
 
-	```python
-	with output(no_warning=True) as output_list:
-	```
++ When used in non-terminal environment, reprint will use the built-in `print` function.
+
++ Does not work in the IDLE terminal, and any other environment that doesn't provide terminal_size.
+
+
+
+## FAQ
+
+**Q: I want to use customize 'sort function' for `dict` mode to sort output lines, what should I do?**
+
+A: You can use that parameter name `sort_key` when initializing the `output` object, such as:
+
+```python
+with output(output_type='dict', sort_key=lambda x:x[1]) as output_lines:
+```
+
+then `reprint` will use that function as the `key` parameter in the `sorted` function 
+
+```python
+elif isinstance(content, dict):
+	for k, v in sorted(content.items(), key=sort_key):
+      	print("{}: {}".format(k, v))
+```
+
+**Q: How to disable all warning?**
+
+A: You can use that parameter name `no_warning` when initializing the `output` object, such as:
+
+```python
+with output(no_warning=True) as output_list:
+```
+

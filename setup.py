@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="reprint",
-    version="0.4.0",
+    version="0.5.0",
     packages=find_packages(),
     install_requires=['six', 'backports.shutil_get_terminal_size'],
     author="Yinzo",
