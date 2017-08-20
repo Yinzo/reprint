@@ -309,7 +309,6 @@ class output:
 
 
     def __init__(self, output_type="list", initial_len=1, interval=0, force_single_line=False, no_warning=False, sort_key=lambda x:x[0]):
-        print("using customize sort key", str(sort_key))
         self.sort_key = sort_key
         self.no_warning = no_warning
         no_warning and print("All reprint warning diabled.")
@@ -323,7 +322,6 @@ class output:
                     sys.exit(0)
 
             is_atty = False
-
 
         if output_type == "list":
             self.warped_obj = output.SignalList(self, [''] * initial_len)
