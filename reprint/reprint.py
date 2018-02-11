@@ -15,6 +15,7 @@ else:
     from shutil import get_terminal_size
     from builtins import input
 
+
 last_output_lines = 0
 overflow_flag = False
 is_atty = sys.stdout.isatty()
@@ -42,6 +43,14 @@ def get_char_width(char):
             return wid
     return 1
 
+def width_cal_preprocess(content):
+    """
+    此函数同时删除 ANSI escape code，避免影响行宽计算
+    This function also remove ANSI escape code to avoid the influence on line width calculation
+    """
+    ptn = re.compile(r'(\033|\x1b)\[.*?m', re.I)
+    _content = re.sub(ptn, '', content) # remove ANSI escape code
+    return _content
 
 def preprocess(content):
     """
@@ -93,7 +102,8 @@ def line_width(line):
     """
     if six.PY2:
         assert isinstance(line, unicode)
-    result = sum(map(get_char_width, line))
+    _line = width_cal_preprocess(line)
+    result = sum(map(get_char_width, _line))
     return result
 
 
