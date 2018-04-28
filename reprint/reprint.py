@@ -198,16 +198,16 @@ class output:
                 else:
                     self.parent.refresh(int(time.time()*1000), forced=False)
 
-        def clear():
+        def clear(self):
             global is_atty
-            with self.lock:
-                if six.PY2:
-                    self[:] = []
-                elif six.PY3:
-                    super(output.SignalList, self).clear()
+            # with self.lock: In all places you call clear, you actually already have the lock
+            if six.PY2:
+                self[:] = []
+            elif six.PY3:
+                super(output.SignalList, self).clear()
 
-                if is_atty:
-                    self.parent.refresh(int(time.time()*1000), forced=False)
+            if is_atty:
+                self.parent.refresh(int(time.time()*1000), forced=False)
 
         def change(self, newlist):
             with self.lock:
@@ -281,10 +281,10 @@ class output:
 
         def clear(self):
             global is_atty
-            with self.lock:
-                super(output.SignalDict, self).clear()
-                if is_atty:
-                    self.parent.refresh(int(time.time()*1000), forced=False)
+            # with self.lock: In all places you call clear, you actually already have the lock
+            super(output.SignalDict, self).clear()
+            if is_atty:
+                self.parent.refresh(int(time.time()*1000), forced=False)
 
         def pop(self, *args, **kwargs):
             global is_atty
