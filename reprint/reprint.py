@@ -15,7 +15,6 @@ else:
     from shutil import get_terminal_size
     from builtins import input
 
-
 last_output_lines = 0
 overflow_flag = False
 is_atty = sys.stdout.isatty()
@@ -156,7 +155,8 @@ def print_multi_line(content, force_single_line, sort_key):
 
     # 确保初始输出位置是位于最左处的
     # to make sure the cursor is at the left most
-    print("\b" * columns, end="")
+    # print("\b" * columns, end="")
+    print("\033[2K", end="")
 
     if isinstance(content, list):
         for line in content:
