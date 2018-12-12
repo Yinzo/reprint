@@ -237,7 +237,7 @@ class output:
         def remove(self, x):
             global is_atty
             with self.lock:
-                super(output.SignalList, self).remove(i, x)
+                super(output.SignalList, self).remove(x)
                 if is_atty:
                     self.parent.refresh(int(time.time()*1000), forced=False)
 
